@@ -1,0 +1,358 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ─── Better Auth ────────────────────────────────────────────────────────
+
+model User {
+  id            String        @id @default(cuid())
+  name          String
+  email         String        @unique
+  emailVerified Boolean       @default(false)
+  image         String?
+  role          UserRole      @default(OWNER)
+  clinicId      String
+  clinic        Clinic        @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  professional  Professional?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  sessions      Session[]
+  accounts      Account[]
+  notifications Notification[]
+
+  @@index([clinicId])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  PROFESSIONAL
+  RECEPTIONIST
+}
+
+// ─── Clinic / Settings ──────────────────────────────────────────────────
+
+model Clinic {
+  id        String   @id @default(cuid())
+  name      String
+  logo      String?
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users         User[]
+  settings      Settings?
+  professionals Professional[]
+  clients       Client[]
+  procedures    Procedure[]
+  appointments  Appointment[]
+  payments      Payment[]
+  expenses      Expense[]
+  stocks        Stock[]
+  notifications Notification[]
+  reminders     Reminder[]
+}
+
+model Settings {
+  id             String   @id @default(cuid())
+  clinicId       String   @unique
+  clinic         Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  businessHours  String   @default("{\"mon\":[\"09:00\",\"19:00\"],\"tue\":[\"09:00\",\"19:00\"],\"wed\":[\"09:00\",\"19:00\"],\"thu\":[\"09:00\",\"19:00\"],\"fri\":[\"09:00\",\"19:00\"],\"sat\":[\"09:00\",\"13:00\"],\"sun\":null}")
+  primaryColor   String   @default("#e11d5f")
+  secondaryColor String   @default("#f5a3bd")
+  updatedAt      DateTime @updatedAt
+}
+
+// ─── Professionals ──────────────────────────────────────────────────────
+
+model Professional {
+  id           String   @id @default(cuid())
+  clinicId     String
+  clinic       Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  userId       String?  @unique
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name         String
+  specialty    String?
+  phone        String?
+  email        String?
+  color        String   @default("#e11d5f")
+  active       Boolean  @default(true)
+  workingHours String   @default("{\"mon\":[\"09:00\",\"19:00\"],\"tue\":[\"09:00\",\"19:00\"],\"wed\":[\"09:00\",\"19:00\"],\"thu\":[\"09:00\",\"19:00\"],\"fri\":[\"09:00\",\"19:00\"],\"sat\":[\"09:00\",\"13:00\"],\"sun\":null}")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  appointments Appointment[]
+
+  @@index([clinicId])
+}
+
+// ─── Clients ─────────────────────────────────────────────────────────────
+
+model Client {
+  id        String    @id @default(cuid())
+  clinicId  String
+  clinic    Clinic    @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  name      String
+  phone     String?
+  whatsapp  String?
+  email     String?
+  birthDate DateTime?
+  cpf       String?
+  instagram String?
+  notes     String?
+  photo     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  appointments Appointment[]
+  payments     Payment[]
+  reminders    Reminder[]
+
+  @@index([clinicId])
+  @@index([clinicId, name])
+}
+
+// ─── Procedures ──────────────────────────────────────────────────────────
+
+model Procedure {
+  id          String   @id @default(cuid())
+  clinicId    String
+  clinic      Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  name        String
+  price       Float
+  duration    Int // minutes
+  description String?
+  color       String   @default("#e11d5f")
+  category    String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  appointments Appointment[]
+
+  @@index([clinicId])
+}
+
+// ─── Appointments ──────────────────────────────────────────────────────────
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model Appointment {
+  id             String            @id @default(cuid())
+  clinicId       String
+  clinic         Clinic            @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  clientId       String
+  client         Client            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  professionalId String
+  professional   Professional      @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  procedureId    String
+  procedure      Procedure         @relation(fields: [procedureId], references: [id], onDelete: Cascade)
+  room           String?
+  startTime      DateTime
+  endTime        DateTime
+  status         AppointmentStatus @default(SCHEDULED)
+  notes          String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  payments Payment[]
+
+  @@index([clinicId, startTime])
+  @@index([professionalId, startTime])
+}
+
+// ─── Financial ──────────────────────────────────────────────────────────
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+  PIX
+  BANK_TRANSFER
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  clinicId      String
+  clinic        Clinic        @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  clientId      String
+  client        Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  appointmentId String?
+  appointment   Appointment?  @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  amount        Float
+  method        PaymentMethod @default(PIX)
+  status        PaymentStatus @default(PAID)
+  paidAt        DateTime      @default(now())
+  notes         String?
+  createdAt     DateTime      @default(now())
+
+  @@index([clinicId, paidAt])
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  clinicId    String
+  clinic      Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  description String
+  amount      Float
+  category    String
+  supplier    String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@index([clinicId, date])
+}
+
+// ─── Stock ──────────────────────────────────────────────────────────────
+
+model Stock {
+  id          String    @id @default(cuid())
+  clinicId    String
+  clinic      Clinic    @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  name        String
+  category    String?
+  quantity    Int       @default(0)
+  minQuantity Int       @default(5)
+  unit        String    @default("un")
+  expiryDate  DateTime?
+  supplier    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  movements StockMovement[]
+
+  @@index([clinicId])
+}
+
+enum StockMovementType {
+  IN
+  OUT
+}
+
+model StockMovement {
+  id       String            @id @default(cuid())
+  stockId  String
+  stock    Stock             @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  type     StockMovementType
+  quantity Int
+  reason   String?
+  date     DateTime          @default(now())
+
+  @@index([stockId, date])
+}
+
+// ─── Notifications / Reminders ───────────────────────────────────────────
+
+enum NotificationType {
+  APPOINTMENT
+  BIRTHDAY
+  STOCK
+  PAYMENT
+  SYSTEM
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  clinicId  String
+  clinic    Clinic           @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType @default(SYSTEM)
+  title     String
+  message   String
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([clinicId, read])
+}
+
+enum ReminderType {
+  APPOINTMENT
+  BIRTHDAY
+  CUSTOM
+}
+
+model Reminder {
+  id        String       @id @default(cuid())
+  clinicId  String
+  clinic    Clinic       @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  clientId  String?
+  client    Client?      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  type      ReminderType @default(CUSTOM)
+  title     String
+  message   String?
+  remindAt  DateTime
+  sent      Boolean      @default(false)
+  createdAt DateTime     @default(now())
+
+  @@index([clinicId, remindAt])
+}
