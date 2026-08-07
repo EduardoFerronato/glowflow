@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -144,10 +143,16 @@ model Professional {
 
 // ─── Clients ─────────────────────────────────────────────────────────────
 
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+  VIP
+}
+
 model Client {
-  id        String    @id @default(cuid())
+  id        String       @id @default(cuid())
   clinicId  String
-  clinic    Clinic    @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  clinic    Clinic       @relation(fields: [clinicId], references: [id], onDelete: Cascade)
   name      String
   phone     String?
   whatsapp  String?
@@ -157,15 +162,54 @@ model Client {
   instagram String?
   notes     String?
   photo     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  status    ClientStatus @default(ACTIVE)
+  /// JSON-encoded string[] (SQLite has no native scalar list support)
+  tags      String       @default("[]")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   appointments Appointment[]
   payments     Payment[]
   reminders    Reminder[]
+  photos       ClientPhoto[]
+  attachments  ClientAttachment[]
 
   @@index([clinicId])
   @@index([clinicId, name])
+}
+
+enum PhotoCategory {
+  BEFORE
+  AFTER
+  GENERAL
+}
+
+model ClientPhoto {
+  id          String        @id @default(cuid())
+  clientId    String
+  client      Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  url         String
+  category    PhotoCategory @default(GENERAL)
+  procedureId String?
+  procedure   Procedure?    @relation(fields: [procedureId], references: [id], onDelete: SetNull)
+  notes       String?
+  takenAt     DateTime      @default(now())
+  createdAt   DateTime      @default(now())
+
+  @@index([clientId])
+}
+
+model ClientAttachment {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  name      String
+  url       String
+  fileType  String?
+  size      Int?
+  createdAt DateTime @default(now())
+
+  @@index([clientId])
 }
 
 // ─── Procedures ──────────────────────────────────────────────────────────
@@ -185,6 +229,7 @@ model Procedure {
   updatedAt   DateTime @updatedAt
 
   appointments Appointment[]
+  clientPhotos ClientPhoto[]
 
   @@index([clinicId])
 }
@@ -194,6 +239,8 @@ model Procedure {
 enum AppointmentStatus {
   SCHEDULED
   CONFIRMED
+  CHECKED_IN
+  IN_PROGRESS
   COMPLETED
   CANCELLED
 }

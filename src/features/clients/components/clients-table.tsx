@@ -9,6 +9,7 @@ import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import {
   Table,
   TableBody,
@@ -27,7 +28,9 @@ import { EmptyState } from "@/components/shared/empty-state"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
 import { ClientFormDialog } from "@/features/clients/components/client-form-dialog"
 import { deleteClientAction } from "@/features/clients/actions"
+import { clientStatusMeta } from "@/features/clients/lib/status"
 import { formatDate } from "@/utils/format"
+import { initials } from "@/utils/initials"
 
 export interface ClientRow {
   id: string
@@ -40,15 +43,10 @@ export interface ClientRow {
   whatsapp: string | null
   instagram: string | null
   notes: string | null
+  status: string
+  tags: string[]
 }
 
-function initials(name: string) {
-  return name
-    .split(" ")
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase())
-    .join("")
-}
 
 export function ClientsTable({ clients }: { clients: ClientRow[] }) {
   const router = useRouter()
@@ -115,6 +113,8 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
                 <TableHead className="hidden sm:table-cell">Telefone</TableHead>
                 <TableHead className="hidden md:table-cell">E-mail</TableHead>
                 <TableHead className="hidden lg:table-cell">Aniversário</TableHead>
+                <TableHead className="hidden md:table-cell">Status</TableHead>
+                <TableHead className="hidden xl:table-cell">Tags</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
             </TableHeader>
@@ -155,6 +155,33 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
                     onClick={() => router.push(`/clientes/${client.id}`)}
                   >
                     {client.birthDate ? formatDate(client.birthDate) : "—"}
+                  </TableCell>
+                  <TableCell
+                    className="hidden md:table-cell"
+                    onClick={() => router.push(`/clientes/${client.id}`)}
+                  >
+                    <Badge variant="secondary" className={clientStatusMeta(client.status).badgeClassName}>
+                      {clientStatusMeta(client.status).label}
+                    </Badge>
+                  </TableCell>
+                  <TableCell
+                    className="hidden xl:table-cell"
+                    onClick={() => router.push(`/clientes/${client.id}`)}
+                  >
+                    {client.tags.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {client.tags.slice(0, 2).map((tag) => (
+                          <Badge key={tag} variant="outline" className="font-normal">
+                            {tag}
+                          </Badge>
+                        ))}
+                        {client.tags.length > 2 ? (
+                          <span className="text-xs text-muted-foreground">+{client.tags.length - 2}</span>
+                        ) : null}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
@@ -208,6 +235,8 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
             instagram: editing.instagram ?? "",
             notes: editing.notes ?? "",
             photo: editing.photo ?? "",
+            status: editing.status as "ACTIVE" | "INACTIVE" | "VIP",
+            tags: editing.tags,
           }}
           onSaved={() => router.refresh()}
         />

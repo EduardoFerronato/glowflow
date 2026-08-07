@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+export const clientStatusValues = ["ACTIVE", "INACTIVE", "VIP"] as const
+
 export const clientSchema = z.object({
   name: z.string().min(2, "Informe o nome do cliente."),
   phone: z.string().optional(),
@@ -10,5 +12,7 @@ export const clientSchema = z.object({
   instagram: z.string().optional(),
   notes: z.string().optional(),
   photo: z.string().optional(),
+  status: z.enum(clientStatusValues),
+  tags: z.array(z.string()),
 })
 export type ClientFormInput = z.infer<typeof clientSchema>

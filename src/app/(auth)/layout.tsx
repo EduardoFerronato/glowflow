@@ -3,26 +3,26 @@ import { Logo } from "@/components/shared/logo"
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-primary via-[#c2185b] to-[#7c1d3f] p-10 text-white lg:flex">
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-primary via-primary to-[oklch(0.4_0.06_35)] p-10 text-primary-foreground lg:flex">
         <div
-          className="pointer-events-none absolute -top-24 -right-24 size-96 rounded-full bg-white/10 blur-3xl"
+          className="pointer-events-none absolute -top-24 -right-24 size-96 rounded-full bg-champagne/40 blur-3xl"
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute bottom-0 left-0 size-72 rounded-full bg-white/10 blur-3xl"
+          className="pointer-events-none absolute bottom-0 left-0 size-72 rounded-full bg-lilac/30 blur-3xl"
           aria-hidden
         />
-        <Logo className="relative z-10 [&_span]:text-white" />
+        <Logo className="relative z-10 [&_span]:text-primary-foreground" />
         <div className="relative z-10 space-y-4">
-          <h2 className="max-w-md text-3xl font-semibold leading-tight tracking-tight">
+          <h2 className="font-display max-w-md text-3xl font-medium leading-tight tracking-tight">
             Gestão completa para sua clínica de estética.
           </h2>
-          <p className="max-w-sm text-sm text-white/80">
+          <p className="max-w-sm text-sm text-primary-foreground/80">
             Agenda, clientes, financeiro e estoque em um só lugar — com a
             experiência premium que sua clínica merece.
           </p>
         </div>
-        <p className="relative z-10 text-xs text-white/60">
+        <p className="relative z-10 text-xs text-primary-foreground/60">
           © {new Date().getFullYear()} GlowFlow. Todos os direitos reservados.
         </p>
       </div>

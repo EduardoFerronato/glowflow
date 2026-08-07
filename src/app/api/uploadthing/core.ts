@@ -25,6 +25,26 @@ export const ourFileRouter = {
     .onUploadComplete(async ({ file }) => {
       return { url: file.ufsUrl }
     }),
+
+  clientGalleryPhoto: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
+    .middleware(async () => {
+      const session = await getSession()
+      if (!session) throw new UploadThingError("Não autenticado.")
+      return { clinicId: session.user.clinicId }
+    })
+    .onUploadComplete(async ({ file }) => {
+      return { url: file.ufsUrl }
+    }),
+
+  clientAttachment: f({ blob: { maxFileSize: "8MB", maxFileCount: 1 } })
+    .middleware(async () => {
+      const session = await getSession()
+      if (!session) throw new UploadThingError("Não autenticado.")
+      return { clinicId: session.user.clinicId }
+    })
+    .onUploadComplete(async ({ file }) => {
+      return { url: file.ufsUrl }
+    }),
 } satisfies FileRouter
 
 export type OurFileRouter = typeof ourFileRouter

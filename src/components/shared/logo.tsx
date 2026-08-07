@@ -19,8 +19,8 @@ export function Logo({ className, iconOnly = false, size = 28 }: LogoProps) {
       >
         <defs>
           <linearGradient id="glowflow-mark" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stopColor="#f472a0" />
-            <stop offset="1" stopColor="#e11d5f" />
+            <stop offset="0" style={{ stopColor: "var(--champagne)" }} />
+            <stop offset="1" style={{ stopColor: "var(--primary)" }} />
           </linearGradient>
         </defs>
         <path
@@ -34,7 +34,7 @@ export function Logo({ className, iconOnly = false, size = 28 }: LogoProps) {
         />
       </svg>
       {!iconOnly ? (
-        <span className="text-lg font-semibold tracking-tight text-foreground">
+        <span className="font-display text-lg font-medium tracking-tight text-foreground">
           GlowFlow
         </span>
       ) : null}

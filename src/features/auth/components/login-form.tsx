@@ -19,7 +19,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import {
+  PremiumCard,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/shared/premium-card"
 import { loginSchema, type LoginInput } from "@/features/auth/schema"
 import { loginAction } from "@/features/auth/actions"
 
@@ -55,9 +61,9 @@ export function LoginForm() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
     >
-      <Card className="border-border/70 shadow-soft-lg">
+      <PremiumCard className="shadow-soft-lg">
         <CardHeader>
-          <CardTitle className="text-xl">Entrar</CardTitle>
+          <CardTitle className="font-display text-2xl font-medium">Entrar</CardTitle>
           <CardDescription>
             Acesse o painel da sua clínica. Use{" "}
             <span className="font-medium text-foreground">demo@glowflow.app</span> /{" "}
@@ -114,7 +120,7 @@ export function LoginForm() {
             </Link>
           </p>
         </CardContent>
-      </Card>
+      </PremiumCard>
     </motion.div>
   )
 }

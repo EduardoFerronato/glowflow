@@ -25,9 +25,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { TagInput } from "@/components/shared/tag-input"
 import { PhotoUpload } from "@/features/clients/components/photo-upload"
 import { clientSchema, type ClientFormInput } from "@/features/clients/schema"
 import { createClientAction, updateClientAction } from "@/features/clients/actions"
+import { CLIENT_STATUSES } from "@/features/clients/lib/status"
 import { formatPhone, formatCpf } from "@/utils/format"
 
 interface ClientFormDialogProps {
@@ -60,6 +69,8 @@ export function ClientFormDialog({
       instagram: defaultValues?.instagram ?? "",
       notes: defaultValues?.notes ?? "",
       photo: defaultValues?.photo ?? "",
+      status: defaultValues?.status ?? "ACTIVE",
+      tags: defaultValues?.tags ?? [],
     },
   })
 
@@ -109,6 +120,45 @@ export function ClientFormDialog({
                   <FormLabel>Nome</FormLabel>
                   <FormControl>
                     <Input placeholder="Nome completo" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecionar" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {CLIENT_STATUSES.map((status) => (
+                        <SelectItem key={status.value} value={status.value}>
+                          {status.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="tags"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tags</FormLabel>
+                  <FormControl>
+                    <TagInput value={field.value} onChange={field.onChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -19,7 +19,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import {
+  PremiumCard,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/shared/premium-card"
 import { registerSchema, type RegisterInput } from "@/features/auth/schema"
 import { registerAction } from "@/features/auth/actions"
 
@@ -53,9 +59,9 @@ export function RegisterForm() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
     >
-      <Card className="border-border/70 shadow-soft-lg">
+      <PremiumCard className="shadow-soft-lg">
         <CardHeader>
-          <CardTitle className="text-xl">Criar sua clínica</CardTitle>
+          <CardTitle className="font-display text-2xl font-medium">Criar sua clínica</CardTitle>
           <CardDescription>Comece a usar o GlowFlow em menos de um minuto.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -141,7 +147,7 @@ export function RegisterForm() {
             </Link>
           </p>
         </CardContent>
-      </Card>
+      </PremiumCard>
     </motion.div>
   )
 }

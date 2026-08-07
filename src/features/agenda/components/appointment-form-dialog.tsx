@@ -43,13 +43,8 @@ import {
   updateAppointmentStatusAction,
 } from "@/features/agenda/actions"
 import { AppointmentStatus } from "@/generated/prisma/enums"
-
-const STATUS_OPTIONS: { value: AppointmentStatus; label: string }[] = [
-  { value: AppointmentStatus.SCHEDULED, label: "Agendado" },
-  { value: AppointmentStatus.CONFIRMED, label: "Confirmado" },
-  { value: AppointmentStatus.COMPLETED, label: "Concluído" },
-  { value: AppointmentStatus.CANCELLED, label: "Cancelado" },
-]
+import { APPOINTMENT_STATUSES } from "@/features/agenda/lib/status"
+import { cn } from "@/lib/utils"
 
 interface Option {
   id: string
@@ -155,11 +150,14 @@ export function AppointmentFormDialog({
 
           {isEdit && status ? (
             <div className="flex flex-wrap gap-1.5">
-              {STATUS_OPTIONS.map((opt) => (
+              {APPOINTMENT_STATUSES.map((opt) => (
                 <Badge
                   key={opt.value}
-                  variant={status === opt.value ? "default" : "outline"}
-                  className="cursor-pointer select-none"
+                  variant="outline"
+                  className={cn(
+                    "cursor-pointer border-transparent select-none transition-opacity",
+                    status === opt.value ? opt.badgeClassName : "bg-muted/60 text-muted-foreground opacity-60 hover:opacity-100"
+                  )}
                   onClick={() => !statusLoading && handleStatusChange(opt.value)}
                 >
                   {opt.label}

@@ -16,19 +16,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { authClient } from "@/lib/auth-client"
+import { initials } from "@/utils/initials"
 
 interface UserMenuProps {
   name: string
   email: string
   image?: string | null
-}
-
-function initials(name: string) {
-  return name
-    .split(" ")
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("")
 }
 
 export function UserMenu({ name, email, image }: UserMenuProps) {

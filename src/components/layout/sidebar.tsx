@@ -6,15 +6,23 @@ import { PanelLeftClose, PanelLeftOpen } from "lucide-react"
 
 import { Logo } from "@/components/shared/logo"
 import { SidebarNav } from "@/components/layout/sidebar-nav"
+import { SidebarProfile } from "@/components/layout/sidebar-profile"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-export function Sidebar() {
+interface SidebarProps {
+  clinicName: string
+  userName: string
+  userEmail: string
+  userImage?: string | null
+}
+
+export function Sidebar({ clinicName, userName, userEmail, userImage }: SidebarProps) {
   const [collapsed, setCollapsed] = React.useState(false)
 
   return (
     <motion.aside
-      animate={{ width: collapsed ? 76 : 248 }}
+      animate={{ width: collapsed ? 76 : 260 }}
       transition={{ type: "spring", stiffness: 320, damping: 32 }}
       className="sticky top-0 hidden h-screen shrink-0 flex-col border-r border-sidebar-border bg-sidebar lg:flex"
     >
@@ -27,11 +35,18 @@ export function Sidebar() {
         <Logo iconOnly={collapsed} />
       </div>
 
-      <div className="flex-1 overflow-y-auto py-2">
+      <div className="flex-1 overflow-y-auto py-3">
         <SidebarNav collapsed={collapsed} />
       </div>
 
-      <div className="border-t border-sidebar-border p-3">
+      <div className="flex flex-col gap-1 border-t border-sidebar-border p-2">
+        <SidebarProfile
+          clinicName={clinicName}
+          userName={userName}
+          userEmail={userEmail}
+          userImage={userImage}
+          collapsed={collapsed}
+        />
         <Button
           variant="ghost"
           size="icon"

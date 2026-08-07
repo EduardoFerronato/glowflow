@@ -14,7 +14,6 @@ import {
   Sparkles,
   Clock,
   StickyNote,
-  ImageIcon,
 } from "lucide-react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -24,14 +23,19 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { EmptyState } from "@/components/shared/empty-state"
 import { ClientFormDialog } from "@/features/clients/components/client-form-dialog"
+import {
+  ClientPhotoGallery,
+  type ClientPhotoEntry,
+} from "@/features/clients/components/client-photo-gallery"
+import {
+  ClientAttachments,
+  type ClientAttachmentEntry,
+} from "@/features/clients/components/client-attachments"
 import { formatCurrency, formatDate, formatDateTime } from "@/utils/format"
+import { initials } from "@/utils/initials"
+import { STATUS_LABEL } from "@/features/agenda/lib/status"
+import { clientStatusMeta } from "@/features/clients/lib/status"
 
-const STATUS_LABEL: Record<string, string> = {
-  SCHEDULED: "Agendado",
-  CONFIRMED: "Confirmado",
-  COMPLETED: "Concluído",
-  CANCELLED: "Cancelado",
-}
 const METHOD_LABEL: Record<string, string> = {
   CASH: "Dinheiro",
   CREDIT_CARD: "Crédito",
@@ -67,13 +71,13 @@ export interface ClientProfileData {
   instagram: string | null
   notes: string | null
   photo: string | null
+  status: string
+  tags: string[]
   createdAt: Date
   appointments: AppointmentEntry[]
   payments: PaymentEntry[]
-}
-
-function initials(name: string) {
-  return name.split(" ").slice(0, 2).map((p) => p[0]?.toUpperCase()).join("")
+  photos: ClientPhotoEntry[]
+  attachments: ClientAttachmentEntry[]
 }
 
 export function ClientProfile({ client }: { client: ClientProfileData }) {
@@ -142,7 +146,15 @@ export function ClientProfile({ client }: { client: ClientProfileData }) {
               </AvatarFallback>
             </Avatar>
             <div className="space-y-1">
-              <h2 className="text-lg font-semibold">{client.name}</h2>
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-lg font-semibold">{client.name}</h2>
+                <Badge
+                  variant="secondary"
+                  className={clientStatusMeta(client.status).badgeClassName}
+                >
+                  {clientStatusMeta(client.status).label}
+                </Badge>
+              </div>
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
                 {client.phone ? (
                   <span className="flex items-center gap-1">
@@ -160,6 +172,15 @@ export function ClientProfile({ client }: { client: ClientProfileData }) {
                   </span>
                 ) : null}
               </div>
+              {client.tags.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {client.tags.map((tag) => (
+                    <Badge key={tag} variant="outline" className="font-normal">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              ) : null}
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -183,6 +204,7 @@ export function ClientProfile({ client }: { client: ClientProfileData }) {
           <TabsTrigger value="historico">Histórico</TabsTrigger>
           <TabsTrigger value="pagamentos">Pagamentos</TabsTrigger>
           <TabsTrigger value="fotos">Fotos</TabsTrigger>
+          <TabsTrigger value="anexos">Anexos</TabsTrigger>
           <TabsTrigger value="procedimentos">Procedimentos</TabsTrigger>
           <TabsTrigger value="timeline">Linha do tempo</TabsTrigger>
           <TabsTrigger value="observacoes">Observações</TabsTrigger>
@@ -264,18 +286,15 @@ export function ClientProfile({ client }: { client: ClientProfileData }) {
         <TabsContent value="fotos">
           <Card className="border-border/70 shadow-soft">
             <CardContent>
-              {client.photo ? (
-                <div className="w-40 overflow-hidden rounded-xl border border-border">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={client.photo} alt={client.name} className="aspect-square w-full object-cover" />
-                </div>
-              ) : (
-                <EmptyState
-                  icon={ImageIcon}
-                  title="Nenhuma foto"
-                  description="Adicione uma foto de perfil editando os dados do cliente."
-                />
-              )}
+              <ClientPhotoGallery clientId={client.id} photos={client.photos} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="anexos">
+          <Card className="border-border/70 shadow-soft">
+            <CardContent>
+              <ClientAttachments clientId={client.id} attachments={client.attachments} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -364,6 +383,8 @@ export function ClientProfile({ client }: { client: ClientProfileData }) {
           instagram: client.instagram ?? "",
           notes: client.notes ?? "",
           photo: client.photo ?? "",
+          status: client.status as "ACTIVE" | "INACTIVE" | "VIP",
+          tags: client.tags,
         }}
         onSaved={() => router.refresh()}
       />

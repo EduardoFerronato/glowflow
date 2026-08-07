@@ -1,9 +1,17 @@
 import { CalendarClock } from "lucide-react"
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import {
+  PremiumCard,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/shared/premium-card"
 import { Badge } from "@/components/ui/badge"
 import { EmptyState } from "@/components/shared/empty-state"
-import { formatDateTime } from "@/utils/format"
+import { formatTime } from "@/utils/format"
+import { statusMeta } from "@/features/agenda/lib/status"
+import { cn } from "@/lib/utils"
 
 interface AppointmentRow {
   id: string
@@ -14,26 +22,22 @@ interface AppointmentRow {
   procedure: { name: string }
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  SCHEDULED: "Agendado",
-  CONFIRMED: "Confirmado",
-  COMPLETED: "Concluído",
-  CANCELLED: "Cancelado",
-}
-
-export function UpcomingAppointments({ appointments }: { appointments: AppointmentRow[] }) {
+export function TodayAgenda({ appointments }: { appointments: AppointmentRow[] }) {
   return (
-    <Card className="border-border/70 shadow-soft">
+    <PremiumCard hover className="h-full">
       <CardHeader>
-        <CardTitle className="text-base">Próximos horários</CardTitle>
-        <CardDescription>Agendamentos confirmados e programados</CardDescription>
+        <CardTitle className="font-display text-lg font-medium">Agenda de hoje</CardTitle>
+        <CardDescription>
+          {appointments.length}{" "}
+          {appointments.length === 1 ? "horário marcado" : "horários marcados"}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {appointments.length === 0 ? (
           <EmptyState
             icon={CalendarClock}
-            title="Nenhum agendamento futuro"
-            description="Os próximos horários da clínica aparecerão aqui."
+            title="Nenhum horário hoje"
+            description="Os agendamentos do dia aparecerão aqui."
           />
         ) : (
           <ul className="space-y-1">
@@ -53,9 +57,12 @@ export function UpcomingAppointments({ appointments }: { appointments: Appointme
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-medium">{formatDateTime(a.startTime)}</p>
-                  <Badge variant="secondary" className="mt-0.5 text-[10px]">
-                    {STATUS_LABEL[a.status] ?? a.status}
+                  <p className="text-xs font-medium">{formatTime(a.startTime)}</p>
+                  <Badge
+                    variant="outline"
+                    className={cn("mt-0.5 border-transparent text-[10px]", statusMeta(a.status).badgeClassName)}
+                  >
+                    {statusMeta(a.status).label}
                   </Badge>
                 </div>
               </li>
@@ -63,6 +70,6 @@ export function UpcomingAppointments({ appointments }: { appointments: Appointme
           </ul>
         )}
       </CardContent>
-    </Card>
+    </PremiumCard>
   )
 }

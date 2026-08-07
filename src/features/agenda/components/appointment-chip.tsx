@@ -6,6 +6,7 @@ import { CSS } from "@dnd-kit/utilities"
 import { cn } from "@/lib/utils"
 import { formatTime } from "@/utils/format"
 import { hexToRgba } from "@/utils/color"
+import { statusMeta } from "@/features/agenda/lib/status"
 
 export interface AppointmentChipData {
   id: string
@@ -65,7 +66,8 @@ export function AppointmentChip({
         {!compact ? (
           <p className="truncate text-muted-foreground">{appointment.procedureName}</p>
         ) : null}
-        <p className="truncate text-[10px] text-muted-foreground/80">
+        <p className="flex items-center gap-1 truncate text-[10px] text-muted-foreground/80">
+          <span className={cn("size-1.5 shrink-0 rounded-full", statusMeta(appointment.status).dotClassName)} />
           {formatTime(appointment.startTime)}
         </p>
       </div>

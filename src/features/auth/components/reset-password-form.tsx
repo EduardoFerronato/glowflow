@@ -19,7 +19,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import {
+  PremiumCard,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/shared/premium-card"
 import { EmptyState } from "@/components/shared/empty-state"
 import { ShieldAlert } from "lucide-react"
 import { resetPasswordSchema, type ResetPasswordInput } from "@/features/auth/schema"
@@ -75,9 +81,9 @@ export function ResetPasswordForm() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
     >
-      <Card className="border-border/70 shadow-soft-lg">
+      <PremiumCard className="shadow-soft-lg">
         <CardHeader>
-          <CardTitle className="text-xl">Definir nova senha</CardTitle>
+          <CardTitle className="font-display text-2xl font-medium">Definir nova senha</CardTitle>
           <CardDescription>Escolha uma nova senha para sua conta.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -116,7 +122,7 @@ export function ResetPasswordForm() {
             </form>
           </Form>
         </CardContent>
-      </Card>
+      </PremiumCard>
     </motion.div>
   )
 }

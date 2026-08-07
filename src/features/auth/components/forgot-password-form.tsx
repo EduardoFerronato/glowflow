@@ -17,7 +17,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import {
+  PremiumCard,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/shared/premium-card"
 import { forgotPasswordSchema, type ForgotPasswordInput } from "@/features/auth/schema"
 import { authClient } from "@/lib/auth-client"
 
@@ -46,9 +52,9 @@ export function ForgotPasswordForm() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
     >
-      <Card className="border-border/70 shadow-soft-lg">
+      <PremiumCard className="shadow-soft-lg">
         <CardHeader>
-          <CardTitle className="text-xl">Recuperar senha</CardTitle>
+          <CardTitle className="font-display text-2xl font-medium">Recuperar senha</CardTitle>
           <CardDescription>
             Informe seu e-mail e enviaremos um link para redefinir sua senha.
           </CardDescription>
@@ -104,7 +110,7 @@ export function ForgotPasswordForm() {
             </Link>
           </p>
         </CardContent>
-      </Card>
+      </PremiumCard>
     </motion.div>
   )
 }

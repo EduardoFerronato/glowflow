@@ -6,14 +6,7 @@ import { toast } from "sonner"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { UploadButton } from "@/lib/uploadthing"
 import { cn } from "@/lib/utils"
-
-function initials(name: string) {
-  return name
-    .split(" ")
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase())
-    .join("")
-}
+import { initials } from "@/utils/initials"
 
 export function PhotoUpload({
   name,

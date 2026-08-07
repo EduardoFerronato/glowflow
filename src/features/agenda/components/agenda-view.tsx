@@ -12,6 +12,7 @@ import {
 import { toast } from "sonner"
 
 import { AgendaToolbar, type AgendaViewMode } from "@/features/agenda/components/agenda-toolbar"
+import { StatusLegend } from "@/features/agenda/components/status-legend"
 import { CalendarGrid } from "@/features/agenda/components/calendar-grid"
 import { MonthView } from "@/features/agenda/components/month-view"
 import { AppointmentFormDialog } from "@/features/agenda/components/appointment-form-dialog"
@@ -214,6 +215,8 @@ export function AgendaView({ clients, professionals, procedures, rooms }: Agenda
         onRoomChange={setRoom}
         onNewAppointment={() => openCreateDialog()}
       />
+
+      <StatusLegend />
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         {isLoading ? (

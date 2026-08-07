@@ -1,6 +1,12 @@
 import { Receipt } from "lucide-react"
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import {
+  PremiumCard,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/shared/premium-card"
 import { EmptyState } from "@/components/shared/empty-state"
 import { formatCurrency, formatDateTime } from "@/utils/format"
 
@@ -23,10 +29,10 @@ const METHOD_LABEL: Record<string, string> = {
 
 export function RecentPayments({ payments }: { payments: PaymentRow[] }) {
   return (
-    <Card className="border-border/70 shadow-soft">
+    <PremiumCard hover>
       <CardHeader>
-        <CardTitle className="text-base">Últimos pagamentos</CardTitle>
-        <CardDescription>Movimentações financeiras recentes</CardDescription>
+        <CardTitle className="font-display text-lg font-medium">Últimas movimentações</CardTitle>
+        <CardDescription>Pagamentos recebidos recentemente</CardDescription>
       </CardHeader>
       <CardContent>
         {payments.length === 0 ? (
@@ -56,6 +62,6 @@ export function RecentPayments({ payments }: { payments: PaymentRow[] }) {
           </ul>
         )}
       </CardContent>
-    </Card>
+    </PremiumCard>
   )
 }

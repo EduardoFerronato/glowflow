@@ -3,8 +3,18 @@
 import { revalidatePath } from "next/cache"
 
 import { requireSession } from "@/lib/session"
-import { createClient, updateClient, deleteClient } from "@/services/client.service"
+import {
+  createClient,
+  updateClient,
+  deleteClient,
+  searchClients,
+  addClientPhoto,
+  deleteClientPhoto,
+  addClientAttachment,
+  deleteClientAttachment,
+} from "@/services/client.service"
 import { clientSchema, type ClientFormInput } from "@/features/clients/schema"
+import type { PhotoCategory } from "@/generated/prisma/enums"
 
 export type ActionResult = { success: true } | { success: false; message: string }
 
@@ -19,6 +29,8 @@ function toClientInput(values: ClientFormInput) {
     instagram: values.instagram || undefined,
     notes: values.notes || undefined,
     photo: values.photo || undefined,
+    status: values.status,
+    tags: values.tags,
   }
 }
 
@@ -54,6 +66,11 @@ export async function updateClientAction(
   }
 }
 
+export async function searchClientsAction(query: string) {
+  const session = await requireSession()
+  return searchClients(session.user.clinicId, query)
+}
+
 export async function deleteClientAction(id: string): Promise<ActionResult> {
   const session = await requireSession()
   try {
@@ -62,5 +79,58 @@ export async function deleteClientAction(id: string): Promise<ActionResult> {
     return { success: true }
   } catch {
     return { success: false, message: "Não foi possível excluir o cliente." }
+  }
+}
+
+export async function addClientPhotoAction(
+  clientId: string,
+  data: { url: string; category: PhotoCategory; notes?: string }
+): Promise<ActionResult> {
+  const session = await requireSession()
+  try {
+    await addClientPhoto(session.user.clinicId, clientId, data)
+    revalidatePath(`/clientes/${clientId}`)
+    return { success: true }
+  } catch {
+    return { success: false, message: "Não foi possível salvar a foto." }
+  }
+}
+
+export async function deleteClientPhotoAction(clientId: string, photoId: string): Promise<ActionResult> {
+  const session = await requireSession()
+  try {
+    await deleteClientPhoto(session.user.clinicId, photoId)
+    revalidatePath(`/clientes/${clientId}`)
+    return { success: true }
+  } catch {
+    return { success: false, message: "Não foi possível remover a foto." }
+  }
+}
+
+export async function addClientAttachmentAction(
+  clientId: string,
+  data: { name: string; url: string; fileType?: string; size?: number }
+): Promise<ActionResult> {
+  const session = await requireSession()
+  try {
+    await addClientAttachment(session.user.clinicId, clientId, data)
+    revalidatePath(`/clientes/${clientId}`)
+    return { success: true }
+  } catch {
+    return { success: false, message: "Não foi possível salvar o anexo." }
+  }
+}
+
+export async function deleteClientAttachmentAction(
+  clientId: string,
+  attachmentId: string
+): Promise<ActionResult> {
+  const session = await requireSession()
+  try {
+    await deleteClientAttachment(session.user.clinicId, attachmentId)
+    revalidatePath(`/clientes/${clientId}`)
+    return { success: true }
+  } catch {
+    return { success: false, message: "Não foi possível remover o anexo." }
   }
 }
