@@ -8,7 +8,7 @@ const RevenueAreaChartLazy = dynamic(
   () => import("@/features/dashboard/components/revenue-area-chart"),
   {
     ssr: false,
-    loading: () => <Skeleton className="h-64 w-full rounded-xl" />,
+    loading: () => <Skeleton className="h-72 w-full rounded-xl" />,
   }
 )
 

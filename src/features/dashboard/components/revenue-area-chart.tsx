@@ -23,7 +23,7 @@ export default function RevenueAreaChart({
   data: { label: string; value: number }[]
 }) {
   return (
-    <ChartContainer config={chartConfig} className="h-64 w-full">
+    <ChartContainer config={chartConfig} className="h-72 w-full">
       <AreaChart data={data} margin={{ left: 0, right: 12, top: 8, bottom: 0 }}>
         <defs>
           <linearGradient id="fillRevenue" x1="0" y1="0" x2="0" y2="1">
