@@ -4,7 +4,7 @@ SaaS de gestão para clínicas de estética. MVP em construção — Fase 1 conc
 
 ## Stack
 
-Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · shadcn/ui · Framer Motion · React Hook Form + Zod · TanStack Query · Prisma 7 (SQLite em dev) · Better Auth · UploadThing · Recharts · @dnd-kit
+Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · shadcn/ui · Framer Motion · React Hook Form + Zod · TanStack Query · Prisma 7 (Prisma Postgres) · Better Auth · UploadThing · Recharts · @dnd-kit
 
 ## Como rodar
 
@@ -18,24 +18,23 @@ Acesse [http://localhost:3000](http://localhost:3000). Login de demonstração (
 - **E-mail:** `demo@glowflow.app`
 - **Senha:** `glowflow123`
 
-Para popular o banco novamente do zero, apague `dev.db` e rode:
+Para popular o banco novamente do zero, rode:
 
 ```bash
-npx prisma migrate dev
-npx prisma db seed
+npx prisma migrate reset
 ```
 
 ## Variáveis de ambiente
 
-Copie `.env.example` para `.env` e ajuste conforme necessário. Em dev, `UPLOADTHING_TOKEN` pode ficar vazio — o upload de fotos simplesmente não funcionará até você configurar uma conta em [uploadthing.com](https://uploadthing.com).
+Copie `.env.example` para `.env` e ajuste conforme necessário. `DATABASE_URL` deve apontar para um banco Postgres (o projeto usa Prisma Postgres, provisionado via Prisma Compute). Em dev, `UPLOADTHING_TOKEN` pode ficar vazio — o upload de fotos simplesmente não funcionará até você configurar uma conta em [uploadthing.com](https://uploadthing.com).
 
-## Migrando de SQLite para MySQL (produção)
+## Deploy (Prisma Compute)
 
-1. Instale o driver: `npm install @prisma/adapter-mariadb mariadb`
-2. Em `prisma/schema.prisma`, troque `provider = "sqlite"` por `provider = "mysql"` no bloco `datasource`.
-3. Em `src/lib/prisma.ts`, troque o adapter `PrismaBetterSqlite3` por `PrismaMariaDb` (veja `.agents/skills/prisma-upgrade-v7/references/driver-adapters.md` para o exemplo completo).
-4. Atualize `DATABASE_URL` para a connection string do MySQL.
-5. Rode `npx prisma migrate deploy`.
+O app está hospedado no Prisma Compute, projeto `GrowFlow` (região `us-east-1`), com o banco Postgres gerenciado pelo próprio Prisma como fonte de dados. Deploys acontecem a partir da branch `main` via `@prisma/cli`:
+
+```bash
+npx @prisma/cli@latest app deploy
+```
 
 ## Estrutura
 
