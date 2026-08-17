@@ -5,6 +5,7 @@ import { useDroppable } from "@dnd-kit/core"
 import { cn } from "@/lib/utils"
 import { AppointmentChip, type AppointmentChipData } from "@/features/agenda/components/appointment-chip"
 import { dateKey } from "@/features/agenda/lib/grid"
+import { isDayClosed, type BusinessHours } from "@/features/agenda/lib/business-hours"
 
 const WEEKDAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
 
@@ -25,12 +26,14 @@ function buildMonthMatrix(reference: Date) {
 function MonthCell({
   day,
   inMonth,
+  closed,
   appointments,
   onClick,
   onChipClick,
 }: {
   day: Date
   inMonth: boolean
+  closed: boolean
   appointments: AppointmentChipData[]
   onClick: () => void
   onChipClick: (id: string) => void
@@ -46,7 +49,7 @@ function MonthCell({
       onClick={onClick}
       className={cn(
         "flex min-h-28 flex-col gap-1 border-b border-r border-border/50 p-1.5 text-xs transition-colors",
-        !inMonth && "bg-muted/30 text-muted-foreground/50",
+        (!inMonth || closed) && "bg-muted/30 text-muted-foreground/50",
         isOver && "bg-primary/10"
       )}
     >
@@ -81,11 +84,13 @@ function MonthCell({
 export function MonthView({
   reference,
   appointments,
+  businessHours,
   onDayClick,
   onChipClick,
 }: {
   reference: Date
   appointments: AppointmentChipData[]
+  businessHours: BusinessHours
   onDayClick: (day: Date) => void
   onChipClick: (id: string) => void
 }) {
@@ -112,6 +117,7 @@ export function MonthView({
             key={dateKey(day)}
             day={day}
             inMonth={day.getMonth() === reference.getMonth()}
+            closed={isDayClosed(day, businessHours)}
             appointments={byDay.get(dateKey(day)) ?? []}
             onClick={() => onDayClick(day)}
             onChipClick={onChipClick}

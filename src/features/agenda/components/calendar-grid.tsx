@@ -11,17 +11,25 @@ import {
   heightForDuration,
   SLOT_HEIGHT,
 } from "@/features/agenda/lib/grid"
+import { isDayClosed, isWithinBusinessHours, type BusinessHours } from "@/features/agenda/lib/business-hours"
 
 const WEEKDAY_FMT = new Intl.DateTimeFormat("pt-BR", { weekday: "short" })
 
 interface CalendarGridProps {
   days: Date[]
   appointments: AppointmentChipData[]
+  businessHours: BusinessHours
   onSlotClick: (day: Date, time: string) => void
   onChipClick: (id: string) => void
 }
 
-export function CalendarGrid({ days, appointments, onSlotClick, onChipClick }: CalendarGridProps) {
+export function CalendarGrid({
+  days,
+  appointments,
+  businessHours,
+  onSlotClick,
+  onChipClick,
+}: CalendarGridProps) {
   const slots = timeSlots()
   const today = dateKey(new Date())
 
@@ -53,12 +61,14 @@ export function CalendarGrid({ days, appointments, onSlotClick, onChipClick }: C
         {days.map((day) => {
           const key = dateKey(day)
           const dayAppointments = byDay.get(key) ?? []
+          const closed = isDayClosed(day, businessHours)
           return (
             <div key={key} className="min-w-[140px] flex-1 border-r border-border/50 last:border-r-0">
               <div
                 className={cn(
                   "sticky top-0 z-10 flex h-12 flex-col items-center justify-center border-b border-border/50 bg-card text-xs",
-                  key === today && "bg-accent/50"
+                  key === today && "bg-accent/50",
+                  closed && "bg-muted/40"
                 )}
               >
                 <span className="capitalize text-muted-foreground">
@@ -74,6 +84,7 @@ export function CalendarGrid({ days, appointments, onSlotClick, onChipClick }: C
                     key={time}
                     id={slotId(day, time)}
                     height={SLOT_HEIGHT}
+                    dimmed={!isWithinBusinessHours(day, time, businessHours)}
                     onClick={() => onSlotClick(day, time)}
                   />
                 ))}

@@ -19,6 +19,7 @@ import { AppointmentFormDialog } from "@/features/agenda/components/appointment-
 import { listAppointmentsAction, rescheduleAppointmentAction } from "@/features/agenda/actions"
 import { dateKey, parseSlotId } from "@/features/agenda/lib/grid"
 import type { AppointmentChipData } from "@/features/agenda/components/appointment-chip"
+import type { BusinessHours } from "@/features/agenda/lib/business-hours"
 import type { AppointmentStatus } from "@/generated/prisma/enums"
 
 interface Option {
@@ -31,6 +32,7 @@ interface AgendaViewProps {
   professionals: (Option & { color: string })[]
   procedures: Option[]
   rooms: string[]
+  businessHours: BusinessHours
 }
 
 const ALL = "all"
@@ -77,7 +79,13 @@ function labelForView(view: AgendaViewMode, reference: Date) {
   return new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(reference)
 }
 
-export function AgendaView({ clients, professionals, procedures, rooms }: AgendaViewProps) {
+export function AgendaView({
+  clients,
+  professionals,
+  procedures,
+  rooms,
+  businessHours,
+}: AgendaViewProps) {
   const queryClient = useQueryClient()
   const [view, setView] = React.useState<AgendaViewMode>("week")
   const [reference, setReference] = React.useState(() => new Date())
@@ -227,6 +235,7 @@ export function AgendaView({ clients, professionals, procedures, rooms }: Agenda
           <MonthView
             reference={reference}
             appointments={appointments}
+            businessHours={businessHours}
             onDayClick={(day) => openCreateDialog(day, "09:00")}
             onChipClick={openEditDialog}
           />
@@ -234,6 +243,7 @@ export function AgendaView({ clients, professionals, procedures, rooms }: Agenda
           <CalendarGrid
             days={view === "day" ? [reference] : Array.from({ length: 7 }, (_, i) => addDays(startOfWeek(reference), i))}
             appointments={appointments}
+            businessHours={businessHours}
             onSlotClick={(day, time) => openCreateDialog(day, time)}
             onChipClick={openEditDialog}
           />
