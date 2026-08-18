@@ -35,15 +35,7 @@ import { formatCurrency, formatDate, formatDateTime } from "@/utils/format"
 import { initials } from "@/utils/initials"
 import { STATUS_LABEL } from "@/features/agenda/lib/status"
 import { clientStatusMeta } from "@/features/clients/lib/status"
-
-const METHOD_LABEL: Record<string, string> = {
-  CASH: "Dinheiro",
-  CREDIT_CARD: "Crédito",
-  DEBIT_CARD: "Débito",
-  PIX: "Pix",
-  BANK_TRANSFER: "Transferência",
-  OTHER: "Outro",
-}
+import { PAYMENT_METHOD_LABEL as METHOD_LABEL } from "@/features/finance/lib/labels"
 
 interface AppointmentEntry {
   id: string

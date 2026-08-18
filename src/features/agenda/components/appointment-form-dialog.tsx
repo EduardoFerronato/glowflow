@@ -33,7 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ClientCombobox } from "@/features/agenda/components/client-combobox"
+import { ClientCombobox } from "@/components/shared/client-combobox"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
 import { appointmentSchema, type AppointmentInput } from "@/features/agenda/schema"
 import {

@@ -8,6 +8,7 @@ import {
   CardContent,
 } from "@/components/shared/premium-card"
 import { EmptyState } from "@/components/shared/empty-state"
+import { PAYMENT_METHOD_LABEL } from "@/features/finance/lib/labels"
 import { formatCurrency, formatDateTime } from "@/utils/format"
 
 interface PaymentRow {
@@ -16,15 +17,6 @@ interface PaymentRow {
   method: string
   paidAt: Date
   client: { name: string }
-}
-
-const METHOD_LABEL: Record<string, string> = {
-  CASH: "Dinheiro",
-  CREDIT_CARD: "Crédito",
-  DEBIT_CARD: "Débito",
-  PIX: "Pix",
-  BANK_TRANSFER: "Transferência",
-  OTHER: "Outro",
 }
 
 export function RecentPayments({ payments }: { payments: PaymentRow[] }) {
@@ -51,7 +43,7 @@ export function RecentPayments({ payments }: { payments: PaymentRow[] }) {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{p.client.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {METHOD_LABEL[p.method] ?? p.method} · {formatDateTime(p.paidAt)}
+                    {PAYMENT_METHOD_LABEL[p.method] ?? p.method} · {formatDateTime(p.paidAt)}
                   </p>
                 </div>
                 <p className="shrink-0 text-sm font-semibold text-emerald-600 dark:text-emerald-400">

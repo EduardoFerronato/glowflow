@@ -2,28 +2,15 @@ import "server-only"
 
 import { prisma } from "@/lib/prisma"
 import { AppointmentStatus, PaymentStatus } from "@/generated/prisma/enums"
-
-function startOfDay(date: Date) {
-  const d = new Date(date)
-  d.setHours(0, 0, 0, 0)
-  return d
-}
-function endOfDay(date: Date) {
-  const d = new Date(date)
-  d.setHours(23, 59, 59, 999)
-  return d
-}
-function startOfMonth(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth(), 1)
-}
-function endOfMonth(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999)
-}
-
-function percentChange(current: number, previous: number) {
-  if (previous <= 0) return current > 0 ? 100 : 0
-  return Math.round(((current - previous) / previous) * 1000) / 10
-}
+import {
+  startOfDay,
+  endOfDay,
+  startOfMonth,
+  endOfMonth,
+  percentChange,
+  WEEKDAY_LABELS,
+  MONTH_LABELS,
+} from "@/utils/date-range"
 
 export async function getDashboardSummary(clinicId: string) {
   const now = new Date()
@@ -202,9 +189,6 @@ export async function getTopProcedures(clinicId: string, limit = 5) {
     .slice(0, limit)
 }
 
-const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
-const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
-
 /**
  * Fetches the last 6 months of payments in a single round trip and derives
  * both the weekly and monthly chart buckets from it (avoids two separate
@@ -237,7 +221,7 @@ export async function getRevenueCharts(clinicId: string) {
     const total = payments
       .filter((p) => p.paidAt >= dayStart && p.paidAt <= dayEnd)
       .reduce((sum, p) => sum + p.amount, 0)
-    return { label: WEEKDAYS[day.getDay()], value: Math.round(total * 100) / 100 }
+    return { label: WEEKDAY_LABELS[day.getDay()], value: Math.round(total * 100) / 100 }
   })
 
   const monthly = months.map((month) => {
@@ -246,7 +230,7 @@ export async function getRevenueCharts(clinicId: string) {
     const total = payments
       .filter((p) => p.paidAt >= mStart && p.paidAt <= mEnd)
       .reduce((sum, p) => sum + p.amount, 0)
-    return { label: MONTHS[month.getMonth()], value: Math.round(total * 100) / 100 }
+    return { label: MONTH_LABELS[month.getMonth()], value: Math.round(total * 100) / 100 }
   })
 
   return { weekly, monthly }
